@@ -13,11 +13,10 @@ h4 {
   font-size: 20px;
   font-color: purple; 
 }
-
 h3 {
   font-family: "Comic Sans MS", cursive, sans-serif;
   font-size: 10px;
-  font-color: purple; 
+  font-color: purple;
 }
 table {
   font-family: arial, sans-serif;
@@ -26,30 +25,66 @@ table {
   width: 90%;
   margin-left: 25px;
 }
-
 th {
   border: 1px solid black;
   background-color: lightgray;
   text-align: left;
   padding: 8px;
 }
-
 td{
   border: 1px solid black;
   text-align: center;
   padding: 8px;
 }
-
 tr{
   background-color: white;
   text-align: center;
+}
+
+/* The navbar container */
+.topnav {
+  height: 60px;
+  width: 90%;
+  text-align: left;
+  margin-left: 400px;
+  margin-top: 5px;
+  margin-bottom: 60px;
+  padding-top: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+/* Navbar links */
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 8px 10px;
+  text-decoration: none;
+}
+/* Links - change color on hover */
+.topnav a:hover {
+  background-color: GoldenRod ;
+  color: Maroon;
 }
 </style>
 </head>
 <body style="background-color:DeepSkyBlue;">
 
+<div class="header">
+
 <center>
-<h1 style="color: red;">STOCK DIGGER</h1>
+<h1 style="color: red;"> STOCK DIGGER</h1>
+</center>
+
+</div>
+
+<center>
+<div class="topnav">
+  <a href="index.html">HOME</a>
+  <a href="contacts.html">CONTACTS</a>
+  <a href="about.html">ABOUT</a>
+</div>
 </center>
 
 <center>
@@ -57,6 +92,9 @@ tr{
 </center>
 
 <h2>Buy, Sell, or Hold?</h2>
-<h4>We made a list of the top 245 stocks and this is our opinion on them. We suggest doing your own rearch with provided links to make your judgement. Good luck!</h4>
+<h4>We made a list of the top 400 stocks that you should consider buying, that we filtered out of 2000+ stocks from NASDAQ. We suggest doing your own research with provided links to make your judgement. Good luck!</h4>
+<h2>Recommended Stocks
+<button id="download_button" type="button" onclick="window.location.href = 'https://drive.google.com/open?id=1-YDlA04L3l8f8gIQWJ4K6baBLs_YKrh1';"\
+        style=" font-size:14pt; width:300px; height:60px; display: block; margin:10px;"> Click to Download </button>
+</h2>
 
-<h2>Recommended Stocks</h2>
