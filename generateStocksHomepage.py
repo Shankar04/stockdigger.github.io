@@ -2,10 +2,11 @@
 import sys
 import os
 import shutil
+
 # File to create Stocks HomePage html file by re-using some sections of the existing homepage and then add stocks information
 inputHtmlFileHeader = 'stockData/index_header.html'
 inputHtmlFileTail = 'stockData/index_footer.html'
-inputStockDataFile = 'stockData/index_body.csv'
+inputStockDataFile = 'stockData/filteredStocksMetricsData.csv'
 outputFile = 'stockData/index.html'
 
 def updateStocksHomePage(inputFile, outputFile):
@@ -21,21 +22,19 @@ def addTableHeader(outputFile):
         fpOut.write('<table>')
         fpOut.write('  <tr>')
         fpOut.write('    <th> Opinion </th>')
-        fpOut.write('    <th > Opinion Date </th>')
-        fpOut.write('    <th > Opinion Price </th>')
+        #fpOut.write('    <th > Opinion Date </th>')
+        #fpOut.write('    <th > Opinion Price </th>')
         fpOut.write('    <th > Current Price </th>')
-        fpOut.write('    <th > Change % </th>')
+        #fpOut.write('    <th > Change % </th>')
         fpOut.write('    <th> Ticker </th>')
         fpOut.write('    <th> Company </th>')
         fpOut.write('    <th> Industry </th>')
         fpOut.write('    <th> Avg Daily Vol </th>')
         fpOut.write('    <th> Market Cap($M) </th>')
-        fpOut.write('    <th> Research Resources </th>')
         fpOut.write('    <th> Inst Ownership % </th>')
         fpOut.write('    <th> P / E Ratio(TTM) </th>')
         fpOut.write('    <th> P / B Ratio </th>')
         fpOut.write('    <th> P / S Ratio </th>')
-        fpOut.write('    <th> Gross Margin % </th>')
         fpOut.write('    <th> Operating Margin % </th>')
         fpOut.write('    <th> Net Margin % </th>')
         fpOut.write('  </tr>')
@@ -46,50 +45,34 @@ def addTableBody(dataRow, outputFile):
     with open(outputFile, 'a') as fpOut:
         Opinion = 'BUY'
         fpOut.write('  <tr>')
+        fpOut.write('    <td> BUY </td>')
+        #fpOut.write('    <td> DATE </td>')
+        #fpOut.write('    <td> str(round(float(Opinion Price), 2)) </td>')
+        fpOut.write('    <td>' + list_vals[9] + '</td>')
+        #fpOut.write('    <td>' + str(round(float(list_vals[8]), 1)) + '</td>')
         fpOut.write('    <td>' + list_vals[0] + '</td>')
         fpOut.write('    <td>' + list_vals[1] + '</td>')
         fpOut.write('    <td>' + list_vals[2] + '</td>')
-        fpOut.write('    <td>' + list_vals[3] + '</td>')
-        fpOut.write('    <td>' + list_vals[4] + '</td>')
-        fpOut.write('    <td>' + list_vals[5] + '</td>')
-        fpOut.write('    <td>' + list_vals[6] + '</td>')
-        fpOut.write('    <td>' + list_vals[7] + '</td>')
-        fpOut.write('    <td>' + list_vals[8] + '</td>')
-        fpOut.write('    <td>' + list_vals[9] + '</td>')
+        fpOut.write('    <td>' + str(int(float(list_vals[7]))) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[5]), 1)) + '</td>')
         # This data field contains '|' separated research links
-        list_links = list_vals[10].split('|')
-        fpOut.write('     <td>')
-        fpOut.write('    <a href="' + list_links[0] + '" target="_blank">')
-        fpOut.write('    <img src="images/fav_gf.png">')
-        fpOut.write('    </a> ')
 
-        fpOut.write('    <a href="' + list_links[1] + '" target="_blank">')
-        fpOut.write('    <img src="images/fav_y.png">')
-        fpOut.write('    </a> ')
-
-        fpOut.write('    <a href="' + list_links[2] + '" target="_blank">')
-        fpOut.write('    <img src="images/fav_si.png">')
-        fpOut.write('    </a>')
-
-        fpOut.write('    <a href="' + list_links[3] + '" target="_blank">')
-        fpOut.write('    <img src="images/fav_st.png">')
-        fpOut.write('    </a>')
-
-        fpOut.write('    <a href="' + list_links[4] + '" target="_blank">')
-        fpOut.write('    <img src="images/fav_mw.png">')
-        fpOut.write('    </a>')
-        fpOut.write('    </td>')
-        fpOut.write('    <td>' + list_vals[11] + '</td>')
-        fpOut.write('    <td>' + list_vals[12] + '</td>')
-        fpOut.write('    <td>' + list_vals[13] + '</td>')
-        fpOut.write('    <td>' + list_vals[14] + '</td>')
-        fpOut.write('    <td>' + list_vals[15] + '</td>')
-        fpOut.write('    <td>' + list_vals[16] + '</td>')
-        fpOut.write('    <td>' + list_vals[17] + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[3]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[41]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[19]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[21]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[32]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[33]), 1)) + '</td>')
         fpOut.write('  </tr>')
 def addTableCloser(outputFile):
     with open(outputFile, 'a') as fpOut:
         fpOut.write('</table>')
+        fpOut.write('<br>')
+        fpOut.write('<br>')
+        fpOut.write('<br>')
+        fpOut.write('<br>')
+        fpOut.write('<br>')
+
 def updateStocksHomePageBody(inputStockDataFile, outputFile):
     # Add the header section of table's html code
     addTableHeader(outputFile)
@@ -103,6 +86,15 @@ def updateStocksHomePageBody(inputStockDataFile, outputFile):
     # Create a plot of top 10 stocks and store it as an image
     # Add html code also to include the image into home page
     #addPlot()
+def pushChangesToGithub():
+    if os.path.isfile(outputFile):
+           print("Updating github repo file: stockdigger.github.io/index.html")
+           shutil.copy(outputFile, 'stockdigger.github.io/')
+    os.chdir("stockdigger.github.io")
+    os.system("git status")
+    os.system("git add index.html")
+    os.system('git commit -am "Updated StocksDataTable"')
+    os.system("git push origin master")
 
 def main(argv):
     # Backup homepage html file, before re-creating with new content
@@ -115,14 +107,7 @@ def main(argv):
     updateStocksHomePageBody(inputStockDataFile, outputFile)
     #Read homepage bottom section of HTML code and write into new file as is
     updateStocksHomePage(inputHtmlFileTail, outputFile)
-    if os.path.isfile(outputFile):
-           print("Updating github repo file: stockdigger.github.io/index.html")
-           shutil.copy(outputFile, 'stockdigger.github.io/')
-    os.chdir("stockdigger.github.io")
-    os.system("git status")
-    os.system("git add index.html")
-    os.system('git commit -m "Updated StocksDataTable"')
-    os.system("git push origin master")
+    pushChangesToGithub()
 
 if __name__ == "__main__":
    main(sys.argv)
