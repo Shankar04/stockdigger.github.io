@@ -45,7 +45,6 @@ MIN_3YR_EBITDA_GROWTH_RATE = 0
 MIN_3YR_EPS_GROWTH_RATE = 0
 
 #Dividend based selection criteria
-
 def isPreliminaryStockFinancialMetricsMet(list_vals):
     if float(list_vals[4].replace(',', '').replace('"', '')) < MIN_MARKET_CAP_MIL:  # Market Cap in Millions
         return False
@@ -151,26 +150,26 @@ def find_element_in_list(element, list_element, valueSpacing):
         #print(element, indx, list_element[indx], valueSpacing, list_element[indx+valueSpacing] )
         # Example: '\nWACC vs ROIC\n', ' ', ' ', ' ', '\nROIC 28.08%\n', '\nWACC 2.85%\n',
         if element == '\nWACC vs ROIC\n':
-            ROIC_WACC_KeyVals = value_element.replace('%','').replace('\n','').split(' ')
+            ROIC_WACC_KeyVals = value_element.split(' ')
             # print(value_element, ROIC_WACC_KeyVals)
             ROIC_WACC_KeyVal = 0
             if len(ROIC_WACC_KeyVals) > 1:
-                ROIC_WACC_KeyVal = ROIC_WACC_KeyVals[1]
+                ROIC_WACC_KeyVal = round(float(ROIC_WACC_KeyVals[1].replace('%','').replace('\n','')), 2)
             else:
                 print('ROIC_WACC_KeyVal info not found, using default 0 value')
             # print(value_element, ROIC_WACC_KeyVal)
-            return round(float(ROIC_WACC_KeyVal), 2)
+            return ROIC_WACC_KeyVal
         elif (valueSpacing < 0 and element == ' Volume: '):
             # '\nWipro Ltd\n$\n3.76\n', ' -0.04 (-1.05%)\n', ' ', ' ', '\n', ' ', ' Volume: ',
             priceChangeVals = value_element.split('(')
             #print(value_element, priceChangeVals)
             priceChangePercent = 0
             if len(priceChangeVals) > 1:
-                priceChangePercent = priceChangeVals[1].replace(')','').replace('%','').replace('\n','')
+                priceChangePercent = round(float(priceChangeVals[1].replace(')','').replace('%','').replace('\n','')),2)
             else:
                 print('PriceChange info not found, using default 0 value')
             # print(value_element, priceChangePercent)
-            return round(float(priceChangePercent),2)
+            return priceChangePercent
 
         #print(element, value_element)
         value_element = value_element.replace(',', '').replace('\n', '').replace(' ', '').replace('$', '').replace('/10', '').replace('Mil','')
@@ -187,7 +186,7 @@ def find_element_in_list(element, list_element, valueSpacing):
         print('stockMetric info not found for:', element.replace('\n', ''))
         return 0
 
-def getStockMetricsData(stockDataUrl):
+def getFilteredStockMetricsData(stockDataUrl):
     #stockMetricsData = {}
     filteredStockMetricsData=''
     try:
@@ -198,6 +197,15 @@ def getStockMetricsData(stockDataUrl):
             }
         )
         response = urllib.request.urlopen(req, timeout=10)
+        # html = requests.get(stockDataUrl, timeout=5).read()
+        # html = urllib.request.urlopen(stockDataUrl).read()
+        html = response.read()
+        soup = BeautifulSoup(html, features="lxml")
+        data = soup.findAll(text=True)
+        result = filter(visible, data)
+        items_list = list(result)
+        # print(items_list)
+
     except ssl.SSLError as err:
         print('SSLError: Socket Connection timed out with error: ', err)
         return ''
@@ -210,15 +218,6 @@ def getStockMetricsData(stockDataUrl):
     except:
         print('An error occurred while accessing: ', stockDataUrl)
         return ''
-
-    #html = requests.get(stockDataUrl, timeout=5).read()
-    #html = urllib.request.urlopen(stockDataUrl).read()
-    html=response.read()
-    soup = BeautifulSoup(html, features="lxml")
-    data = soup.findAll(text=True)
-    result = filter(visible, data)
-    items_list=list(result)
-    #print(items_list)
 
     #Order of keys: DoubleSpacedKeys1 SingleSpacedKeys2 TripleSpacedPriceKeys3 DoubleSpacedKeys4 NoSpacedKeys5 DoubleSpacedKeys6
     #print(DoubleSpacedKeys1)
@@ -265,6 +264,7 @@ def getStockMetricsData(stockDataUrl):
         keyData=find_element_in_list(keyFeature, items_list,3)
         # print(keyFeature.replace(',', '').replace(' ', '').replace('\n', ''), keyData)
         # Add any filtering conditions here
+
         filteredStockMetricsData += str(keyData) + ','
         #stockMetricsData[keyFeature.replace(',', '').replace(':', '').replace(' ', '').replace('\n', '')] = keyData
 
@@ -277,6 +277,7 @@ def getStockMetricsData(stockDataUrl):
         keyData=find_element_in_list(keyFeature, items_list,2)
         #print(keyFeature.replace(',', '').replace(' ', '').replace('\n', ''), keyData)
         # Add any filtering conditions here
+
         if (keyFeature == DoubleSpacedKeys4[1]) and keyData > MAX_PB_RATIO:
             return ''
 
@@ -289,6 +290,7 @@ def getStockMetricsData(stockDataUrl):
         keyData=find_element_in_list(keyFeature, items_list,4)
         # print('ROIC', keyData)
         # Add any filtering conditions here
+
         filteredStockMetricsData += str(keyData) + ','
         #stockMetricsData['ROIC'] = keyData
 
@@ -307,6 +309,7 @@ def getStockMetricsData(stockDataUrl):
         keyData=find_element_in_list(keyFeature, items_list,2)
         # print(keyFeature.replace(',', '').replace(' ', '').replace('\n', ''), keyData)
         # Add any filtering conditions here
+
         filteredStockMetricsData += str(keyData) + ','
         #stockMetricsData[keyFeature.replace(',', '').replace(':', '').replace(' ', '').replace('\n', '')] = keyData
 
@@ -315,7 +318,7 @@ def getStockMetricsData(stockDataUrl):
 def addHeader(startingColNames, outputFile):
     #Order of keys: DoubleSpacedKeys1 SingleSpacedKeys2 TripleSpacedPriceKeys3 DoubleSpacedKeys4 QudrapleSpacedPriceKeys5 DoubleSpacedKeys6
     with open(outputFile, "w") as filehandle:
-        filehandle.write('%s' % startingColNames)
+        filehandle.write('%s,' % startingColNames)
         for keyFeature in DoubleSpacedKeys1:
             filehandle.write('%s,' % keyFeature.replace(',', '').replace(':', '').replace(' ', '').replace('\n', ''))
             #print(keyFeature.replace(',', '').replace(' ', '').replace('\n', ''), ',')
@@ -342,19 +345,20 @@ def addHeader(startingColNames, outputFile):
                 filehandle.write('\n')
             #print(keyFeature.replace(',', '').replace(' ', '').replace('\n', ''), ',')
 
+'''
+Description: 
+'''
 def main(argv):
     #tickers = argv[1:]
-    inputFile = 'stocksData/preFilteredStocksData.csv'
-    outputFile = 'stocksData/preFilteredStocksMetricsData.csv'
-    outputFilteredFile = 'stocksData/filteredStocksMetricsData.csv'
+    inputFile = 'stockData/preFilteredStocksData.csv'
+    outputFilteredFile = 'stockData/filteredStocksMetricsData.csv'
 
     fpIn = open(inputFile, 'r')
-    data = csv.reader(fpIn, skipinitialspace=True)
-    for list_vals in data:
+    stocksDataRows = csv.reader(fpIn, skipinitialspace=True)
+    for list_vals in stocksDataRows:
         if list_vals[0] == 'Ticker':
             #Ticker,CompanyName,IndustryName, InstOwnership
-            startingColNames = list_vals[0] + ',' + list_vals[1].replace(',', ' ') + ',' +list_vals[2].replace(',', ' ') + ',' + list_vals[3].replace(',', ' ')+',';
-            #addHeader(startingColNames, outputFile)
+            startingColNames = list_vals[0] + ',' + list_vals[1].replace(',', ' ') + ',' +list_vals[2].replace(',', ' ') + ',' + list_vals[3].replace(',', ' ');
             addHeader(startingColNames, outputFilteredFile)
             continue  # skip header line
 
@@ -365,7 +369,7 @@ def main(argv):
         ticker=list_vals[0]
         stockDataUrl='https://www.gurufocus.com/stock/'+ticker+'/summary'
         try:
-            stockMetricsData = getStockMetricsData(stockDataUrl)
+            stockMetricsData = getFilteredStockMetricsData(stockDataUrl)
         except:
             print('An error occurred while accessing: ', stockDataUrl)
             continue
@@ -379,6 +383,5 @@ def main(argv):
             fpOut.write('%s\n' % (list_vals[0] + ',' + list_vals[1].replace(',', ' ') + ',' + list_vals[2].replace(',', ' ') + ',' + list_vals[3].replace(',', ' ')
                                     + ','+stockMetricsData ))
     fpIn.close()
-
 if __name__ == "__main__":
    main(sys.argv)
