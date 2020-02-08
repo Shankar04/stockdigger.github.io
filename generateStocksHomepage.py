@@ -6,8 +6,9 @@ import shutil
 # File to create Stocks HomePage html file by re-using some sections of the existing homepage and then add stocks information
 inputHtmlFileHeader = 'stockData/index_header.html'
 inputHtmlFileTail = 'stockData/index_footer.html'
-inputStockDataFile = 'stockData/filteredStocksMetricsData.csv'
+inputStockDataFile = 'stockData/filteredStocksMetricsData_peON_pbON_qrON_nmON.csv'
 outputFile = 'stockData/index.html'
+#outputFile = 'stockData/StocksFilteredBy_peON_pbON_qrON_nmON.html'
 
 def updateStocksHomePage(inputFile, outputFile):
     with open(outputFile, 'a') as fpOut:
@@ -17,6 +18,14 @@ def updateStocksHomePage(inputFile, outputFile):
                 # print(line)
                 fpOut.write(line)
                 line = fpIn.readline()
+#Ticker	Company	Industry	Country(Headquarter)	InstitutionalOwnership	MarketCap$	EnterpriseValue$	Volume	AvgVol(1m)	1DayPriceChangePercent
+# 10: Price	PBRatio	Price-to-Tangible-Book	PSRatio	Price-to-Median-PS-Value	Price-to-Graham-Number	Price-to-Peter-Lynch-Fair-Value
+# 13: Price-to-Intrinsic-Value-DCF(EarningsBased)	Price-to-Intrinsic-Value-DCF(FCFBased)	Price-to-Intrinsic-Value-Projected-FCF	Price-to-Earnings-Power-Value
+# 17: PEGRatio	CurrentRatio	QuickRatio	Cash-To-Debt	Equity-to-Asset	Debt-to-Equity	Debt-to-EBITDA	OperatingMargin%	NetMargin%	ROE%	ROA%	ROIC
+# 29: WACC	ShillerPERatio	PERatio	ForwardPERatio	PERatiowithoutNRI	EV-to-EBIT	EV-to-EBITDA	EV-to-Revenue	3-YearRevenueGrowthRate	3-YearEBITDAGrowthRate
+# 39: 3-YearEPSwithoutNRIGrowthRate	Price-to-Owner-Earnings	Price-to-Free-Cash-Flow	Price-to-Operating-Cash-Flow	PiotroskiF-Score	AltmanZ-Score	BeneishM-Score
+# 46: FinancialStrength	ProfitabilityRank	ValuationRank
+
 def addTableHeader(outputFile):
     with open(outputFile, 'a') as fpOut:
         fpOut.write('<table>')
@@ -32,9 +41,9 @@ def addTableHeader(outputFile):
         fpOut.write('    <th> Avg Daily Vol </th>')
         fpOut.write('    <th> Market Cap($M) </th>')
         fpOut.write('    <th> Inst Ownership % </th>')
-        fpOut.write('    <th> P / E Ratio(TTM) </th>')
-        fpOut.write('    <th> P / B Ratio </th>')
-        fpOut.write('    <th> P / S Ratio </th>')
+        fpOut.write('    <th> P/E Ratio(TTM) </th>')
+        fpOut.write('    <th> P/B Ratio </th>')
+        fpOut.write('    <th> Quick Ratio </th>')
         fpOut.write('    <th> Operating Margin % </th>')
         fpOut.write('    <th> Net Margin % </th>')
         fpOut.write('  </tr>')
@@ -48,21 +57,21 @@ def addTableBody(dataRow, outputFile):
         fpOut.write('    <td> BUY </td>')
         #fpOut.write('    <td> DATE </td>')
         #fpOut.write('    <td> str(round(float(Opinion Price), 2)) </td>')
-        fpOut.write('    <td>' + list_vals[9] + '</td>')
+        fpOut.write('    <td>' + list_vals[10] + '</td>')
         #fpOut.write('    <td>' + str(round(float(list_vals[8]), 1)) + '</td>')
         fpOut.write('    <td>' + list_vals[0] + '</td>')
         fpOut.write('    <td>' + list_vals[1] + '</td>')
         fpOut.write('    <td>' + list_vals[2] + '</td>')
-        fpOut.write('    <td>' + str(int(float(list_vals[7]))) + '</td>')
+        fpOut.write('    <td>' + str(int(float(list_vals[8]))) + '</td>')
         fpOut.write('    <td>' + str(round(float(list_vals[5]), 1)) + '</td>')
         # This data field contains '|' separated research links
 
-        fpOut.write('    <td>' + str(round(float(list_vals[3]), 1)) + '</td>')
-        fpOut.write('    <td>' + str(round(float(list_vals[41]), 1)) + '</td>')
-        fpOut.write('    <td>' + str(round(float(list_vals[19]), 1)) + '</td>')
-        fpOut.write('    <td>' + str(round(float(list_vals[21]), 1)) + '</td>')
-        fpOut.write('    <td>' + str(round(float(list_vals[32]), 1)) + '</td>')
-        fpOut.write('    <td>' + str(round(float(list_vals[33]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[4]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[35]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[11]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[22]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[26]), 1)) + '</td>')
+        fpOut.write('    <td>' + str(round(float(list_vals[27]), 1)) + '</td>')
         fpOut.write('  </tr>')
 def addTableCloser(outputFile):
     with open(outputFile, 'a') as fpOut:
